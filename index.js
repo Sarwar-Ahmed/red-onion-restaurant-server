@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect(err => {
   const foodCollection = client.db("redOnionDB").collection("foodMenu");
   const servicesCollection = client.db("redOnionDB").collection("services");
+  const cartCollection = client.db("redOnionDB").collection("cart");
   
   app.get('/foodMenu', (req, res) => {
       foodCollection.find({})
@@ -33,12 +34,18 @@ client.connect(err => {
         res.send(documents);
     })
   })
+  app.get('/cart', (req, res) => {
+    cartCollection.find({})
+    .toArray((err, documents) => {
+      res.status(200).send(documents);
+    })
+  })
 
-  app.post('/addFoodMenu', (req, res) => {
-      foodCollection.insertMany([])
+  app.post('/addCart', (req, res) => {
+      const events = req.body;
+      cartCollection.insertOne(events)
       .then(result => {
-          res.send(result.insertedCount);
-        // console.log("added")
+        res.status(200).send(result.insertedCount);
       })
   })
 });
